@@ -1,0 +1,20 @@
+---
+- name: install required packages
+  apt: name={{ item }} state=present update_cache=yes cache_valid_time=86400
+  with_items:
+      - runit
+
+- file: path={{ ansible_asg_appdir }} state=directory
+- template: src=app_hashes.j2 dest={{ ansible_asg_appdir }}/hashes.yml 
+- template: src=app_config.j2 dest={{ ansible_asg_appdir }}/config.yml 
+- copy: src=asg_respond.py dest={{ ansible_asg_appdir }}
+- shell: chown -R {{ ansible_asg_username }} {{ ansible_asg_homedir }}
+
+# setup runit
+- file: path={{ ansible_asg_appdir }}/runit_ansible_asg/log state=directory
+- file: path={{ ansible_asg_logdir }} state=directory owner={{ ansible_asg_username }}
+- template: src=run_ansible_asg.j2 dest={{ ansible_asg_appdir }}/runit_ansible_asg/run mode=0755
+- template: src=run_ansible_asg_log.j2 dest={{ ansible_asg_appdir }}/runit_ansible_asg/log/run mode=0755
+- file: src={{ ansible_asg_appdir }}/runit_ansible_asg dest=/etc/service/runit_ansible_asg state=link
+
+

@@ -1,0 +1,4 @@
+#!/bin/bash
+export ANSIBLE_HOST_KEY_CHECKING=False
+cd {{ ansible_asg_appdir }}
+exec chpst -u {{ ansible_asg_username }} python asg_respond.py 2>&1

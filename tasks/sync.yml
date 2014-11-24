@@ -1,0 +1,12 @@
+---
+- local_action: shell cd {{ ansible_asg_local_roles_path }} && tar zcpf /tmp/roles.tar.gz .
+- file: path={{ ansible_asg_homedir }}/roles state=directory
+- unarchive: src=/tmp/roles.tar.gz dest={{ ansible_asg_homedir }}/roles copy=yes
+
+- file: path={{ ansible_asg_homedir }}/inventory state=directory
+- local_action: shell cd {{ ansible_asg_local_inventory_path }} && tar zcpf /tmp/inventory.tar.gz .
+- unarchive: src=/tmp/inventory.tar.gz dest={{ ansible_asg_homedir }}/inventory copy=yes
+
+- local_action: shell cd {{ ansible_asg_local_playbook_path }} &&  tar zcpf /tmp/playbooks.tar.gz .
+- file: path={{ ansible_asg_homedir }}/playbooks state=directory
+- unarchive: src=/tmp/playbooks.tar.gz dest={{ ansible_asg_homedir }}/playbooks copy=yes

@@ -1,0 +1,18 @@
+---
+# vars file for ansible-master
+ansible_asg_username: ansible
+ansible_asg_homedir: /home/ansible
+ansible_asg_appdir: /home/ansible/ansible_asg_autoscale
+ansible_asg_logdir: /var/log/ansible_asg
+ansible_asg_local_roles_path: ~/ansible/roles
+ansible_asg_local_inventory_path: ~/ansible/inventory
+ansible_asg_local_playbook_path: ~/ansible/playbooks
+aws_ssh_private_key: ~/ansible/aws_key.pem
+aws_remote_user: ubuntu
+aws_access_key_id: YOUR_ACCESS_KEY
+aws_secret_access_key: YOUR_SECRET_KEY
+aws_region: us-east-1
+app:
+  hashes:
+    596524d707e18a17ee521f7710d628e3: worker.yml
+  port: 9001

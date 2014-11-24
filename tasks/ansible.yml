@@ -1,0 +1,14 @@
+---
+- apt_repository: repo='ppa:ansible/ansible'
+- apt: name=ansible state=present update_cache=yes cache_valid_time=86400
+- apt: name=python-boto state=present update_cache=yes cache_valid_time=86400
+
+# setup .boto
+- template: src=boto.cfg.j2 dest={{ ansible_asg_homedir }}/.boto
+
+# setup the ssh key
+- file: path={{ ansible_asg_homedir }}/.ssh state=directory
+- copy: src={{ aws_ssh_private_key }} dest={{ ansible_asg_homedir }}/.ssh/id_rsa mode=0400
+
+# setup .ansible.cfg for roles and inventory path
+- template: src=ansible.cfg.j2 dest={{ ansible_asg_homedir }}/.ansible.cfg
