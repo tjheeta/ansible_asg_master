@@ -11,3 +11,4 @@
 
 # Synchronize roles and inventory and playbooks
 - include: sync.yml
+  when: ansible_asg_local_sync == true

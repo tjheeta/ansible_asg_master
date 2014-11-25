@@ -1,5 +1,6 @@
 ---
 # vars file for ansible-master
+ansible_asg_local_sync: true
 ansible_asg_username: ansible
 ansible_asg_homedir: /home/ansible
 ansible_asg_appdir: /home/ansible/ansible_asg_autoscale
