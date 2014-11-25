@@ -61,7 +61,8 @@ Example Playbook
 See the example section. 
 
 ```
-ansible-playbook -i example/inventory example/playbooks/create.yml
+ansible-playbook -i example/inventory --tags main example/playbooks/create.yml
+ansible-playbook -i example/inventory --tags autoscale_group example/playbooks/create.yml
 ```
 
 License
