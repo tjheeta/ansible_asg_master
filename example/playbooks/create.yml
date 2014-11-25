@@ -1,0 +1,101 @@
+---
+# Basic provisioning example
+- name: Create AWS resources
+  hosts: localhost
+  connection: local
+  gather_facts: False
+  tasks:
+  - name: Create security group
+    local_action:
+      module: ec2_group
+      name: worker_fw
+      description: "worker_fw"
+      region: "{{aws_region}}"
+      rules:
+        - proto: tcp
+          type: ssh
+          from_port: 22
+          to_port: 22
+          cidr_ip: 0.0.0.0/0
+        - proto: udp
+          from_port: 60000
+          to_port: 60100
+          cidr_ip: 0.0.0.0/0
+      rules_egress:
+        - proto: all
+          type: all
+          cidr_ip: 0.0.0.0/0
+    register: worker_fw
+    tags: main
+
+  - name: create main instance
+    local_action:
+      module: ec2
+      key_name: "{{aws_key_name}}"
+      region: "{{aws_region}}"
+      group: [ "default", "worker_fw" ]
+      instance_type: "{{aws_instance_type}}"
+      instance_tags:
+        group: main
+      count_tag: 
+        group: main
+      exact_count: 1
+      image: "{{aws_ami_id}}"
+      wait: yes
+    register: ec2host_main
+    tags: main
+
+  - debug: var=ec2host_main
+
+  - add_host: hostname={{ item.public_ip }} groupname=main
+    with_items: ec2host_main.tagged_instances
+
+  - name: wait for main instances to listen on port:22
+    wait_for: state=started host={{ item.public_ip }} port=22
+    with_items: ec2host_main.tagged_instances
+    tags: main
+
+- name: configure the main
+  hosts: 
+    - tag_group_main
+    - main
+  remote_user: ubuntu
+  sudo: true
+  roles:
+    - ansible_asg_master
+  tags: 
+    - main
+    - configure_main
+
+- name: Create autoscale group
+  hosts: localhost
+  connection: local
+  gather_facts: False
+  vars:
+    # This will get set to run during the callback to the master server
+    userdata_playbook: worker.yml
+  tasks:
+  - debug: msg="{{ lookup('template', 'userdata_worker.j2') }}"
+    tags: launch_config
+  - name: setup the launch config for the autoscale group for workers with the user_data scripts 
+    ec2_lc:
+      name: worker_lc
+      image_id: "{{ aws_ami_id }}"
+      key_name: "{{aws_key_name}}"
+      region: "{{aws_region}}"
+      security_groups: "default,worker_fw"
+      instance_type: "{{ aws_instance_type }}"
+      user_data: "{{ lookup('template', 'userdata_worker.j2') }}"
+    tags: 
+      - launch_config
+      - autoscale_group
+
+  - name: setup the autoscaling group
+    ec2_asg:
+      name: worker_asg
+      health_check_period: 60
+      launch_config_name: worker_lc
+      min_size: 1
+      max_size: 1
+      region: "{{aws_region}}"
+    tags: autoscale_group

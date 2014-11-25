@@ -1,0 +1,7 @@
+---
+- hosts: all
+  sudo: true
+  tasks:
+    - shell: touch /tmp/ran_the_playbook
+
+

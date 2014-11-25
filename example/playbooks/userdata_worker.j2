@@ -1,0 +1,5 @@
+#!/bin/sh
+{% for host in groups['tag_group_main'] %}
+curl http://{{ hostvars[host]['ec2_private_ip_address'] }}:{{ ansible_asg_app['port'] }}/api/ec2/asg/{{ userdata_playbook }}
+{% endfor %}
+

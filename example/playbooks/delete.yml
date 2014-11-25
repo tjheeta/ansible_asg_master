@@ -1,0 +1,21 @@
+---
+# Basic decommissioning example
+- name: Delete asg
+  hosts: localhost
+  connection: local
+  gather_facts: False
+  tasks:
+  - name: Remove asg config
+    local_action: ec2_asg name=worker_asg region="{{aws_region}}"  state=absent
+  - name: Remove launch config
+    local_action: ec2_lc name=worker_lc region="{{aws_region}}"  state=absent
+
+- name: Delete worker EC2 instances
+  #hosts: security_group_worker_fw
+  hosts: tag_aws_autoscaling_groupName_worker_asg
+  connection: local
+  gather_facts: False
+  tasks:
+  - name: Terminate {{ec2_id}} instance in {{aws_region}}
+    local_action: ec2 state=absent region='{{ aws_region }}' instance_ids='{{ec2_id}}' wait=true
+

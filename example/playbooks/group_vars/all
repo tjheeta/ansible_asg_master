@@ -1,0 +1,15 @@
+ansible_asg_local_roles_path: /home/self/ansible/roles
+ansible_asg_local_inventory_path: /home/self/ansible/inventory
+ansible_asg_local_playbook_path: /home/self/ansible/playbooks
+aws_ssh_private_key: /home/self/ec2_private_key.pem
+aws_remote_user: ubuntu
+aws_access_key_id: YOUR_ACCESS_KEY
+aws_secret_access_key: YOUR_SECRET_KEY
+aws_region: us-east-1
+aws_ami_id: ami-f2c74d9a
+aws_instance_type: t1.micro
+aws_key_name: ec2_key
+ansible_asg_app:
+  port: 9001
+#  hashes:
+#    1234: crawler_worker.yml
