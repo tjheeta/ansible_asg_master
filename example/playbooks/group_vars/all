@@ -1,6 +1,6 @@
-ansible_asg_local_roles_path: /home/self/ansible/roles
-ansible_asg_local_inventory_path: /home/self/ansible/inventory
-ansible_asg_local_playbook_path: /home/self/ansible/playbooks
+ansible_asg_local_roles_path: /home/yourname/ansible_asg_master/example/roles
+ansible_asg_local_inventory_path: /home/yourname/ansible_asg_master/example/inventory
+ansible_asg_local_playbook_path: /home/yourname/ansible_asg_master/example/playbooks
 aws_ssh_private_key: /home/self/ec2_private_key.pem
 aws_remote_user: ubuntu
 aws_access_key_id: YOUR_ACCESS_KEY
