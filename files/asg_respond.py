@@ -4,7 +4,6 @@ import time
 import BaseHTTPServer
 import boto
 import boto.ec2
-import pprint
 from urlparse import urlparse
 import ansible.playbook
 from ansible import callbacks
@@ -12,11 +11,22 @@ from ansible import utils
 import os, sys
 import yaml
 
-pp = pprint.PrettyPrinter(indent=4)
+def convert_keys_to_string(dictionary):
+    """Recursively converts dictionary keys to strings."""
+    if not isinstance(dictionary, dict):
+        return dictionary
+    return dict((str(k), convert_keys_to_string(v)) 
+        for k, v in dictionary.items())
 
-with open('hashes.yml') as f: 
-    hashes=yaml.load(f)
-with open('config.yml') as f: 
+# setup the hashes if they exist
+use_hashes = False
+hashes_name = 'hashes.yml'
+if os.path.isfile(hashes_name):
+    use_hashes = True
+    with open(hashes_name) as f:
+        hashes=convert_keys_to_string(yaml.load(f))
+
+with open('config.yml') as f:
     config=yaml.load(f)
     if not 'port' in config or not 'region' in config or not 'playbook_path' in config:
       print "Configuration incorrect. Need to specify the port, aws region, and playbook path"
@@ -27,12 +37,14 @@ PORT_NUMBER = config['port']
 
 #print boto.ec2.get_all_instances()
 class APIHandler(BaseHTTPServer.BaseHTTPRequestHandler):
-    def verify_ipaddress(self, ipaddress):
+    def ec2_verify_ipaddress(self, ipaddress):
         conn = boto.ec2.connect_to_region(config['region'])
         reservations=conn.get_all_instances()
         instances = [i for r in reservations for i in r.instances]
         for i in instances:
             if i.private_ip_address == ipaddress:
+                return True
+            if i.ip_address == ipaddress:
                 return True
         return False
 
@@ -59,27 +71,36 @@ class APIHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         self.send_header("Content-type", "text/html")
         self.end_headers()
 
-    def api_asg(self):
+    def api_ec2_asg(self):
         uri = urlparse(self.path)
-        run_hash=os.path.basename(uri.path)
-        if run_hash in hashes:
-            #if self.verify_ipaddress("172.31.59.87"):
-            host = self.client_address[0]
-            playbook = hashes[run_hash]
-            if self.verify_ipaddress(host):
-                self.run_playbook(host, os.path.join(config['playbook_path'], playbook))
-                self.send_response(200, hashes[run_hash])
+        current_hash=os.path.basename(uri.path) # /the/uri/$current_hash
+        if use_hashes:
+            if current_hash in hashes:
+                playbook = os.path.join(config['playbook_path'], hashes[current_hash])
             else:
-                self.send_error(403, "Access Denied")
+                self.send_error(404, "Not found")
+                return False
         else:
+            playbook = os.path.join(config['playbook_path'], current_hash)
+
+        if not os.path.isfile(playbook):
             self.send_error(404, "Not found")
+            return False
+
+        host = self.client_address[0]
+        if self.ec2_verify_ipaddress(host):
+            self.send_response(200, playbook)
+            self.run_playbook(host, playbook)
+            return True
+        else:
+            self.send_error(403, "Access Denied")
+            return True
 
     def do_GET(self):
         """Respond to a GET request."""
-        pp.pprint(self.address_string())
         uri = urlparse(self.path)
-        if uri.path.startswith("/api/asg/"):
-            self.api_asg()
+        if uri.path.startswith("/api/ec2/asg/"):
+            self.api_ec2_asg()
         else:
             self.send_error(404, "Not found")
 

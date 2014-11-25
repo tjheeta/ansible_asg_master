@@ -5,9 +5,19 @@
       - runit
 
 - file: path={{ ansible_asg_appdir }} state=directory
-- template: src=app_hashes.j2 dest={{ ansible_asg_appdir }}/hashes.yml 
+
+# Only setup the hashes if they exist
+- template: src=app_hashes.j2 dest={{ ansible_asg_appdir }}/hashes.yml
+  notify: restart_asg_app
+  when: ansible_asg_app['hashes'] is defined
+- file: path={{ ansible_asg_appdir }}/hashes.yml state=absent
+  when: ansible_asg_app['hashes'] is not defined
+
 - template: src=app_config.j2 dest={{ ansible_asg_appdir }}/config.yml 
+  notify: restart_asg_app
 - copy: src=asg_respond.py dest={{ ansible_asg_appdir }}
+  notify: restart_asg_app
+
 - shell: chown -R {{ ansible_asg_username }} {{ ansible_asg_homedir }}
 
 # setup runit

@@ -12,7 +12,7 @@ aws_remote_user: ubuntu
 aws_access_key_id: YOUR_ACCESS_KEY
 aws_secret_access_key: YOUR_SECRET_KEY
 aws_region: us-east-1
-app:
-  hashes:
-    596524d707e18a17ee521f7710d628e3: worker.yml
+ansible_asg_app:
+  #hashes:
+  #  596524d707e18a17ee521f7710d628e3: worker.yml
   port: 9001
