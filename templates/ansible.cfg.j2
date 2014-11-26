@@ -5,3 +5,4 @@ remote_user={{ aws_remote_user }}
 private_key_file={{ ansible_asg_homedir }}/.ssh/id_rsa
 pipelining = true
 log_file={{ ansible_asg_logdir }}/ansible.log
+host_key_checking = {{ ansible_asg_hostkey_check }}
