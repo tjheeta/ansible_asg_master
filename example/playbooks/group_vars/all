@@ -1,3 +1,5 @@
+ansible_asg_hostkey_check: false
+ansible_asg_local_sync: true
 ansible_asg_local_roles_path: /home/yourname/ansible_asg_master/example/roles
 ansible_asg_local_inventory_path: /home/yourname/ansible_asg_master/example/inventory
 ansible_asg_local_playbook_path: /home/yourname/ansible_asg_master/example/playbooks
@@ -7,9 +9,10 @@ aws_access_key_id: YOUR_ACCESS_KEY
 aws_secret_access_key: YOUR_SECRET_KEY
 aws_region: us-east-1
 aws_ami_id: ami-f2c74d9a
-aws_instance_type: t1.micro
 aws_key_name: ec2_key
+aws_instance_type: t2.micro
 ansible_asg_app:
   port: 9001
+  playbook_path: "{{ ansible_asg_homedir }}/playbooks"
 #  hashes:
 #    1234: crawler_worker.yml

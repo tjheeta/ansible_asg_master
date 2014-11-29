@@ -19,3 +19,4 @@ ansible_asg_app:
   #hashes:
   #  596524d707e18a17ee521f7710d628e3: worker.yml
   port: 9001
+  playbook_path: "{{ ansible_asg_homedir }}/playbooks"
