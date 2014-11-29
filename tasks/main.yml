@@ -1,13 +1,10 @@
 ---
-- user: name={{ ansible_asg_username }}
-
-- apt: name=python-keyczar state=present update_cache=yes cache_valid_time=86400
-
 # setup ansible to run 
 - include: ansible.yml
 
 # Setup the autoscale callback application 
 - include: app.yml
+  when: ansible_asg_app_setup == true
 
 # Synchronize roles and inventory and playbooks
 - include: sync.yml

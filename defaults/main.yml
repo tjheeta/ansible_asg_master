@@ -1,6 +1,7 @@
 ---
 # vars file for ansible-master
 ansible_asg_hostkey_check: false
+ansible_asg_app_setup: true
 ansible_asg_local_sync: true
 ansible_asg_username: ansible
 ansible_asg_homedir: /home/ansible

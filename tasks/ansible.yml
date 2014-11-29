@@ -1,4 +1,6 @@
 ---
+- user: name={{ ansible_asg_username }}
+
 - apt_repository: repo='ppa:ansible/ansible'
 - apt: name=ansible state=present update_cache=yes cache_valid_time=86400
 - apt: name=python-boto state=present update_cache=yes cache_valid_time=86400
